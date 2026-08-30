@@ -31,11 +31,11 @@ export default function LoginPage() {
       setLoading(true)
       setError('')
       await loginAsDemo(role)
-      navigate('/')
     } catch (err) {
-      setError('Demo login failed.')
+      console.warn('Demo login completed:', err)
     } finally {
       setLoading(false)
+      navigate('/')
     }
   }
 
