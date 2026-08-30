@@ -3,7 +3,7 @@ services:
     name: jobconnect-api
     env: python
     region: singapore
-    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate"
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate && python seed_data.py"
     startCommand: "gunicorn jobconnect.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
