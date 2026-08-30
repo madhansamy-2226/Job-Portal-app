@@ -4,6 +4,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from accounts.views import RegisterView, LoginView, UserProfileView, AdminUserViewSet
 from companies.views import CompanyViewSet
@@ -20,7 +22,29 @@ router.register(r'saved-jobs', SavedJobViewSet, basename='saved-job')
 router.register(r'applications', ApplicationViewSet, basename='application')
 router.register(r'admin/users', AdminUserViewSet, basename='admin-user')
 
+@api_view(['GET'])
+def api_root_info(request):
+    return Response({
+        'status': 'online',
+        'app': 'JobConnect REST API',
+        'version': '1.0.0',
+        'endpoints': {
+            'jobs': request.build_absolute_uri('/api/jobs/'),
+            'categories': request.build_absolute_uri('/api/categories/'),
+            'companies': request.build_absolute_uri('/api/companies/'),
+            'applications': request.build_absolute_uri('/api/applications/'),
+            'auth_login': request.build_absolute_uri('/api/auth/login/'),
+            'auth_register': request.build_absolute_uri('/api/auth/register/'),
+            'user_profile': request.build_absolute_uri('/api/profile/'),
+            'analytics_stats': request.build_absolute_uri('/api/analytics/stats/'),
+        }
+    })
+
 urlpatterns = [
+    # Root API welcome endpoint
+    path('', api_root_info, name='api_root_home'),
+    path('api/', api_root_info, name='api_root_info'),
+
     path('admin/', admin.site.urls),
     
     # Auth endpoints
