@@ -37,7 +37,18 @@ export default function RegisterPage() {
       })
       navigate('/')
     } catch (err) {
-      setError(err.response?.data?.email?.[0] || err.response?.data?.username?.[0] || 'Registration failed. Please check your details.')
+      console.error('Registration error:', err)
+      const data = err.response?.data
+      let msg = 'Registration failed. Please check your details.'
+      if (data) {
+        if (typeof data === 'string') msg = data
+        else if (data.error) msg = data.error
+        else if (data.detail) msg = data.detail
+        else if (data.username) msg = `Username: ${Array.isArray(data.username) ? data.username.join(' ') : data.username}`
+        else if (data.email) msg = `Email: ${Array.isArray(data.email) ? data.email.join(' ') : data.email}`
+        else if (data.password) msg = `Password: ${Array.isArray(data.password) ? data.password.join(' ') : data.password}`
+      }
+      setError(msg)
     } finally {
       setLoading(false)
     }

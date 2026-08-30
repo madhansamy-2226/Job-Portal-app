@@ -41,9 +41,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         company_name = validated_data.pop('company_name', None)
         password = validated_data.pop('password')
-        user = User.objects.create_user(**validated_data)
-        user.set_password(password)
-        user.save()
+        user = User.objects.create_user(password=password, **validated_data)
 
         # Create corresponding profile/company
         if user.role == 'SEEKER':

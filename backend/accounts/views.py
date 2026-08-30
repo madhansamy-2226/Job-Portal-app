@@ -30,25 +30,28 @@ class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        username = request.data.get('username') or request.data.get('email')
+        credential = request.data.get('username') or request.data.get('email')
         password = request.data.get('password')
 
-        if not username or not password:
+        if not credential or not password:
             return Response({'error': 'Please provide username/email and password.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Allow login by email or username
-        user = None
-        if '@' in username:
+        # 1. Try authenticating by username first
+        user = authenticate(username=credential, password=password)
+
+        # 2. Try authenticating by email lookup if credential contains @ or username auth failed
+        if not user:
             try:
-                user_obj = User.objects.get(email__iexact=username)
-                user = authenticate(username=user_obj.username, password=password)
-            except User.DoesNotExist:
+                user_obj = User.objects.filter(email__iexact=credential).first()
+                if user_obj:
+                    user = authenticate(username=user_obj.username, password=password)
+                    if not user and user_obj.check_password(password):
+                        user = user_obj
+            except Exception:
                 user = None
-        else:
-            user = authenticate(username=username, password=password)
 
         if not user:
-            return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'error': 'Invalid credentials. Please check your username/email and password.'}, status=status.HTTP_401_UNAUTHORIZED)
 
         if not user.is_active:
             return Response({'error': 'Account is deactivated. Please contact support.'}, status=status.HTTP_403_FORBIDDEN)
