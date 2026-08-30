@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
 
     if (savedUser && token) {
       setUser(JSON.parse(savedUser))
-      // Verify profile from server
       fetchProfile()
     } else {
       setLoading(false)
@@ -43,13 +42,48 @@ export const AuthProvider = ({ children }) => {
   }
 
   const loginAsDemo = async (role) => {
-    let credentials = { username: 'seeker@gmail.com', password: 'seeker123' }
-    if (role === 'EMPLOYER') {
-      credentials = { username: 'employer@techcorp.com', password: 'employer123' }
-    } else if (role === 'ADMIN') {
-      credentials = { username: 'admin@jobconnect.com', password: 'admin123' }
+    let credentials = { 
+      username: 'rahul_seeker', 
+      email: 'seeker@gmail.com', 
+      password: 'seeker123', 
+      first_name: 'Rahul', 
+      last_name: 'Kumar', 
+      role: 'SEEKER' 
     }
-    return await login(credentials.username, credentials.password)
+    if (role === 'EMPLOYER') {
+      credentials = { 
+        username: 'employer_abc', 
+        email: 'employer@techcorp.com', 
+        password: 'employer123', 
+        first_name: 'Anand', 
+        last_name: 'Verma', 
+        role: 'EMPLOYER', 
+        company_name: 'ABC Technologies' 
+      }
+    } else if (role === 'ADMIN') {
+      credentials = { 
+        username: 'admin', 
+        email: 'admin@jobconnect.com', 
+        password: 'admin123', 
+        first_name: 'System', 
+        last_name: 'Admin', 
+        role: 'ADMIN' 
+      }
+    }
+
+    try {
+      return await login(credentials.username, credentials.password)
+    } catch (err) {
+      try {
+        return await login(credentials.email, credentials.password)
+      } catch (err2) {
+        try {
+          return await register(credentials)
+        } catch (regErr) {
+          throw err
+        }
+      }
+    }
   }
 
   const register = async (userData) => {
