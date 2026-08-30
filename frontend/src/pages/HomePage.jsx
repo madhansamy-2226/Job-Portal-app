@@ -3,9 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import API from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 import { 
-  Search, MapPin, Briefcase, Users, Building2, Layers, 
-  Code, Database, Palette, Smartphone, HeartPulse, TrendingUp, Coins, ChevronRight,
-  UserCheck, ShieldCheck, Building, CheckCircle2
+  Search, MapPin, Briefcase, ChevronRight,
+  Code, Database, Palette, Smartphone, HeartPulse, TrendingUp, Coins
 } from 'lucide-react'
 
 // Icon mapping helper
@@ -22,16 +21,25 @@ const getCategoryIcon = (iconName) => {
   }
 }
 
+const defaultCategories = [
+  { id: 1, name: 'IT & Software', icon: 'Code', job_count: 3 },
+  { id: 2, name: 'Data Science', icon: 'Database', job_count: 1 },
+  { id: 3, name: 'Design', icon: 'Palette', job_count: 1 },
+  { id: 4, name: 'Mobile Development', icon: 'Smartphone', job_count: 1 },
+  { id: 5, name: 'Healthcare', icon: 'HeartPulse', job_count: 12 },
+  { id: 6, name: 'Marketing', icon: 'TrendingUp', job_count: 12 },
+  { id: 7, name: 'Finance', icon: 'Coins', job_count: 12 },
+  { id: 8, name: 'Business', icon: 'Briefcase', job_count: 12 },
+]
+
 export default function HomePage() {
   const navigate = useNavigate()
   const { user, loginAsDemo } = useAuth()
   const [keyword, setKeyword] = useState('')
   const [location, setLocation] = useState('')
-  const [stats, setStats] = useState({ active_jobs: 4, registered_users: 100, companies_count: 200, categories_count: 8 })
-  const [categories, setCategories] = useState([])
-  const [featuredJobs, setFeaturedJobs] = useState([])
+  const [stats, setStats] = useState({ active_jobs: 6, registered_users: 100, companies_count: 200, categories_count: 8 })
+  const [categories, setCategories] = useState(defaultCategories)
   const [loading, setLoading] = useState(true)
-  const [demoLoading, setDemoLoading] = useState(false)
 
   useEffect(() => {
     fetchHomeData()
@@ -40,16 +48,17 @@ export default function HomePage() {
   const fetchHomeData = async () => {
     try {
       setLoading(true)
-      const [statsRes, catRes, jobsRes] = await Promise.all([
+      const [statsRes, catRes] = await Promise.all([
         API.get('/analytics/stats/'),
-        API.get('/categories/'),
-        API.get('/jobs/featured/')
+        API.get('/categories/')
       ])
-      setStats(statsRes.data)
-      setCategories(catRes.data.results || catRes.data)
-      setFeaturedJobs(jobsRes.data.results || jobsRes.data)
+      if (statsRes.data) setStats(statsRes.data)
+      const apiCats = catRes.data.results || catRes.data
+      if (Array.isArray(apiCats) && apiCats.length > 0) {
+        setCategories(apiCats)
+      }
     } catch (err) {
-      console.error('Error loading homepage data:', err)
+      console.warn('Backend API loading, using initial mock defaults:', err)
     } finally {
       setLoading(false)
     }
@@ -63,21 +72,10 @@ export default function HomePage() {
     navigate(`/jobs?${queryParams.toString()}`)
   }
 
-  const handleQuickDemo = async (role) => {
-    try {
-      setDemoLoading(true)
-      await loginAsDemo(role)
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setDemoLoading(false)
-    }
-  }
-
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col pb-16">
       
-      {/* 1. HERO BANNER - Matching Blue Header Card in Screenshot */}
+      {/* 1. HERO BANNER */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 w-full">
         <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 rounded-2xl p-8 md:p-12 text-center text-white shadow-xl relative overflow-hidden">
           <div className="absolute -right-10 -top-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
@@ -100,7 +98,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. THREE ROLE CARDS - Matching Green Button Cards in Screenshot */}
+      {/* 2. THREE ROLE CARDS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 w-full">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Card 1: For Job Seekers */}
@@ -153,7 +151,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. SEARCH BAR - Matching exact Screenshot search inputs */}
+      {/* 3. SEARCH BAR */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 w-full">
         <form onSubmit={handleSearch} className="bg-white p-3 rounded-xl border border-slate-200 shadow-md flex flex-col md:flex-row gap-3 items-center">
           <div className="flex-1 flex items-center px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg w-full">
@@ -186,7 +184,7 @@ export default function HomePage() {
         </form>
       </section>
 
-      {/* 4. RECENT STATISTICS - Matching Screenshot statistics cards */}
+      {/* 4. RECENT STATISTICS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 w-full">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-slate-900">Recent Statistics</h2>
@@ -211,7 +209,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. BROWSE BY CATEGORY - Matching 8 category cards */}
+      {/* 5. BROWSE BY CATEGORY */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 w-full">
         <div className="flex justify-between items-end mb-6">
           <div>
