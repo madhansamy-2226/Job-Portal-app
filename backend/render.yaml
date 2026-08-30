@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: jobconnect-api
+    env: python
+    region: singapore
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate"
+    startCommand: "gunicorn jobconnect.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: SUPABASE_URL
+        value: https://nrajyfgyxjfiqgxhcrul.supabase.co
+      - key: SUPABASE_KEY
+        sync: false

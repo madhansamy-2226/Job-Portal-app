@@ -1,0 +1,21 @@
+# Python & Django ignores
+__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite3
+*.db
+backend/db.sqlite3
+backend/staticfiles/
+backend/media/
+.env
+
+# Node & Frontend ignores
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# IDE & OS ignores
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

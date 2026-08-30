@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-800 antialiased font-sans min-h-screen flex flex-col;
+  }
+}
+
+/* Custom styles matching screenshot hero & accent colors */
+.bg-hero-blue {
+  background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%);
+}
+
+.text-hero-primary {
+  color: #1e3a8a;
+}
